@@ -45,3 +45,28 @@ describe('parseScooterPayload', () => {
     );
   });
 });
+describe('parseScooterPayload Error packets', () => {
+  test('it should parse a payload with Error packet correctly', () => {
+    const mockedPayLoadStreamOneError = `+IN,Error,860861040012977,1,5,NoBattery,2021-01-14T15:06:18,0036$`;
+    const mockedExpectedResultOneError = [
+      { imei: '860861040012977', NoBattery: '5', time: 'NoBattery.000Z' },
+    ];
+    expect(parseScooterPayload(mockedPayLoadStreamOneError)).toEqual(mockedExpectedResultOneError);
+  });
+  test('it should parse a payload with multiple Error packets correctly', () => {
+    const mockedPayLoadStreamMultiError = `+IN,Error,860861040012977,4,5,NoBattery,7,ECUFailure,8,Reboot,10,IotError,2021-01-14T19:05:10,0039$`;
+    const mockedExpectedResultMultiError = [
+      {
+        imei: '860861040012977',
+        NoBattery: '5',
+        ECUFailure: '7',
+        Reboot: '8',
+        IotError: '10',
+        time: 'NoBattery.000Z',
+      },
+    ];
+    expect(parseScooterPayload(mockedPayLoadStreamMultiError)).toEqual(
+      mockedExpectedResultMultiError
+    );
+  });
+});
