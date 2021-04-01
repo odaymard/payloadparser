@@ -14,7 +14,7 @@ const getErrorStream = (params) => {
   return {
     imei: params[2],
     ...errorData,
-    time: `${params[5]}.000Z`,
+    time: `${params[params.length -2]}.000Z`,
   };
 };
 function parseScooterPayload(payload) {
@@ -33,4 +33,6 @@ function parseScooterPayload(payload) {
 
 module.exports = {
   parseScooterPayload,
+  getDeviceInfoStream,
+  getErrorStream
 };

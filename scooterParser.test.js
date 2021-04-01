@@ -1,4 +1,4 @@
-const { parseScooterPayload } = require('./scooterParser');
+const { parseScooterPayload, getDeviceInfoStream, getErrorStream } = require('./scooterParser');
 
 describe('parseScooterPayload', () => {
   test('it should parse a payload with DeviceInfo packet correctly', () => {
@@ -53,7 +53,7 @@ describe('parseScooterPayload Error packets', () => {
   test('it should parse a payload with Error packet correctly', () => {
     const mockedPayLoadStreamOneError = `+IN,Error,860861040012977,1,5,NoBattery,2021-01-14T15:06:18,0036$`;
     const mockedExpectedResultOneError = [
-      { imei: '860861040012977', NoBattery: '5', time: 'NoBattery.000Z' },
+      { imei: '860861040012977', NoBattery: '5', time: '2021-01-14T15:06:18.000Z' },
     ];
     expect(parseScooterPayload(mockedPayLoadStreamOneError)).toEqual(mockedExpectedResultOneError);
   });
@@ -66,11 +66,52 @@ describe('parseScooterPayload Error packets', () => {
         ECUFailure: '7',
         Reboot: '8',
         IotError: '10',
-        time: 'NoBattery.000Z',
+        time: '2021-01-14T19:05:10.000Z',
       },
     ];
     expect(parseScooterPayload(mockedPayLoadStreamMultiError)).toEqual(
       mockedExpectedResultMultiError
     );
+  });
+});
+describe('getDeviceInfoStream', () => {
+  test('it should return an object with correct values', () => {
+    const mockedDeviceInfo = [
+      '+IN',
+      'DeviceInfo',
+      '123456789012345',
+      '86',
+      '5600',
+      '2021-01-14T15:05:10',
+      '0035$',
+    ];
+    const mockedExpectedResult = {
+      imei: '123456789012345',
+      batteryLevel: '86 %',
+      odometer: '5600 km',
+      time: '2021-01-14T15:05:10.000Z',
+    };
+    expect(getDeviceInfoStream(mockedDeviceInfo)).toEqual(mockedExpectedResult);
+  });
+});
+describe('getErrorStream', () => {
+  test('it should return an object with correct values', () => {
+    const mockedErrorInfo = [
+      '+IN',
+      'Error',
+      '860861040012977',
+      '1',
+      '5',
+      'NoBattery',
+      '2021-01-14T15:06:18',
+      '0036$',
+    ];
+
+    const mockedExpectedResult =  {
+      imei: '860861040012977',
+      NoBattery: '5',
+      time: '2021-01-14T15:06:18.000Z'
+    };
+     expect(getErrorStream(mockedErrorInfo)).toEqual(mockedExpectedResult);
   });
 });
