@@ -16,4 +16,5 @@ function parseScooterPayload(payload) {
 
 module.exports = {
   parseScooterPayload,
+  getDeviceInfoStream,
 };

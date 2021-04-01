@@ -1,4 +1,4 @@
-const { parseScooterPayload } = require('./scooterParser');
+const { parseScooterPayload, getDeviceInfoStream } = require('./scooterParser');
 
 describe('parseScooterPayload', () => {
   test('it should parse a payload with DeviceInfo packet correctly', () => {
@@ -47,5 +47,26 @@ describe('parseScooterPayload', () => {
   test('it should return invalid input if the payload does not have inputs', () => {
     const invalidInput = `somethingwrong`;
     expect(parseScooterPayload(invalidInput)).toEqual('invalid input');
+  });
+});
+
+describe('getDeviceInfoStream', () => {
+  test('it should return an object with correct values', () => {
+    const mockedDeviceInfo = [
+      '+IN',
+      'DeviceInfo',
+      '123456789012345',
+      '86',
+      '5600',
+      '2021-01-14T15:05:10',
+      '0035$',
+    ];
+    const mockedExpectedResult = {
+      imei: '123456789012345',
+      batteryLevel: '86 %',
+      odometer: '5600 km',
+      time: '2021-01-14T15:05:10.000Z',
+    };
+    expect(getDeviceInfoStream(mockedDeviceInfo)).toEqual(mockedExpectedResult);
   });
 });
